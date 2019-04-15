@@ -1,0 +1,61 @@
+{
+  "name": "@zajdasoft/grocery",
+  "version": "1.0.1",
+  "description": "Grocery JS / React library bringing multiple stores and messaging system for modular webapps.",
+  "main": "index.js",
+  "scripts": {
+    "pack": "babel src --out-dir lib --ignore src/**/*.spec.*",
+    "bundle": "rimraf lib/* && npm run pack",
+    "eslint": "eslint --ext .js --ext .jsx .",
+    "watch": "nodemon -x \"npm run pack\" -i lib -e js,jsx",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zajdasoft/grocery.git"
+  },
+  "keywords": [
+    "grocery",
+    "js",
+    "react",
+    "store",
+    "multiple"
+  ],
+  "author": "Jiří Zajíček",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zajdasoft/grocery/issues"
+  },
+  "homepage": "https://github.com/zajdasoft/grocery#readme",
+  "dependencies": {},
+  "peerDependencies": {
+    "prop-types": "^15.7.2",
+    "react": "^16.8.6"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.3",
+    "@babel/core": "^7.4.3",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/plugin-proposal-throw-expressions": "^7.2.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-syntax-object-rest-spread": "^7.2.0",
+    "@babel/preset-env": "^7.4.3",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.4.0",
+    "@types/prop-types": "^15.7.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.12.4",
+    "nodemon": "^1.18.11",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.6",
+    "rimraf": "^2.6.3"
+  },
+  "directories": {
+    "lib": "lib"
+  }
+}
