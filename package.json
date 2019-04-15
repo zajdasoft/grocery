@@ -1,6 +1,6 @@
 {
   "name": "@zajdasoft/grocery",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Grocery JS / React library bringing multiple stores and messaging system for modular webapps.",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "multiple"
   ],
   "author": "Jiří Zajíček",
-  "license": "MIT",
+  "license": "LGPL-3.0",
   "bugs": {
     "url": "https://github.com/zajdasoft/grocery/issues"
   },
