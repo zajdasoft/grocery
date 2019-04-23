@@ -2,6 +2,59 @@ import React, { useState, useEffect, useContext } from 'react';
 import { arrayOf, node, oneOfType } from 'prop-types';
 import Observable from './Observable';
 
+const middlewares = [];
+
+/**
+ * @callback middleware
+ * @param {Grocery} grocery Caller Grocery.
+ * @param {object} newState New state to be added.
+ * @param {object} action Launching action.
+ * @param {function} next Call next middleware in the chain.
+ */
+
+/**
+ * Add a middleware.
+ * @param {middleware} middleware
+ * @returns {Function}
+ */
+export const addGroceryMiddleware = (middleware) => {
+  if (middlewares.indexOf(middleware) >= 0) throw Error("Middleware is already in the middleware chain.");
+  middlewares.push(middleware);
+  return () => {
+    middlewares.splice(middlewares.indexOf(middleware), 1);
+  }
+};
+
+/**
+ * Grocery logger.
+ * @param logger Logging object.
+ * @returns {Function}
+ */
+const groceryDefaultLogger = (logger) => (grocery, newState, action, next) => {
+  const state = grocery.getState();
+
+  logger.group(`%c action`, 'color: #cccccc', `${(action && action.type) || action}`);
+  logger.log('%caction', 'color: #cccccc', action);
+
+  if (newState === state) {
+    logger.log('%cunchangedState', 'color: #cccccc', state);
+  } else {
+    logger.log('%cprevState', 'color: #cc0000', state);
+    logger.log('%cnextState', 'color: #0000cc', newState);
+  }
+
+  logger.groupEnd();
+  next();
+};
+
+/**
+ * Add logger for grocery.
+ * @param logger Logger object. Default is console.
+ */
+export const addGroceryLogger = (logger = console) => {
+  addGroceryMiddleware(groceryDefaultLogger(logger))
+};
+
 /**
  * Grocery constructs a general store and connecting components for it.
  * @param {*} initState Initial state.
@@ -54,7 +107,14 @@ export default function Grocery(initState, firstMount = null) {
    */
   this.dispatch = (action) => {
     const newState = reduce(store, action);
-    if (newState === store) return;
+    let cancel = false;
+
+    for (let middleware of middlewares) {
+      cancel = true;
+      middleware(this, newState, action, () => cancel = false);
+      if (cancel) return;
+    }
+
     store = newState;
     oStore.publish(newState);
   };
