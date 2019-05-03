@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "pack": "babel src --out-dir lib --ignore src/**/*.spec.*",
+    "prepublish": "npm run bundle",
     "bundle": "rimraf lib/* && npm run pack",
     "eslint": "eslint --ext .js --ext .jsx .",
     "watch": "nodemon -x \"npm run pack\" -i lib -e js,jsx",
