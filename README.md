@@ -1,6 +1,6 @@
 # grocery
 Grocery JS / container for managing application state, designed to be used in modular applications. 
-Combining power of redux-like store and messaging system.
+Combining power of flux-like store and messaging system.
 
 ## About
 
@@ -196,7 +196,7 @@ to the reducer or another enhancer.
 From Grocery perspective, enhancer is another reducer, which makes possible to enhance even enhancers. First, 
 ``enhanceReducer`` must take third argument as name for the enhancer. Then you can enhance the enhancer in another module.
 
-THis example shows how to use ``next`` to change ``ADD_TODO`` action when its payload is ``'test'``:
+This example shows how to use ``next`` to change ``ADD_TODO`` action when its payload is ``'test'``:
 ```javascript
 
 import MyGrocery, { ADD_TODO, REDUCER_BASE_TODO } from './groceries/MyGrocery';
@@ -214,7 +214,7 @@ MyGrocery.enhanceReducer(REDUCER_BASE_TODO, (state, action, next) => {
 ### Middlewares
 
 Grocery supports usage of middlewares. Middlewares are called for all groceries in your application. This allows to handle
-development or error logging on one place.
+development or error logging in one place.
 
 ```javascript
 import { addGroceryMiddleware, addGroceryLogger } from '@zajdasoft/grocery';

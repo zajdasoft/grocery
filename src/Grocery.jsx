@@ -91,6 +91,28 @@ const mapArrayOrSingle = (array, map) => (Array.isArray(array)
   : [map(array, 0)]);
 
 /**
+ * {@link GroceryCore} provides instance of {@link Grocery}.
+ * @param {*} initState Initial state.
+ * @param {Grocery} grocery Parent grocery.
+ * @constructor
+ */
+class GroceryCore {
+  constructor(initState, grocery) {
+    this.state = initState;
+    this.observer = new Observable(grocery);
+  }
+
+  /**
+   * Set new state.
+   * @param {*} newState
+   */
+  setState(newState) {
+    this.state = newState;
+    this.observer.publish(newState);
+  }
+}
+
+/**
  * {@link Grocery} constructs a general store and connecting components for it.
  * @param {*} [initState] Initial state.
  * @param {Function} [firstMount] Call when the first component is firstly mounted.
@@ -205,15 +227,14 @@ export default function Grocery({
     };
   };
 
-  let store = initStateCopy;
-  const oStore = new Observable(this);
+  const core = new GroceryCore(initStateCopy, this);
 
   let hotDispose = null;
   if (typeof window !== 'undefined' && windowProperty) {
     /* eslint-disable no-undef */
     const storePreloadValue = window[windowProperty] || initStateCopy;
-    store = storePreloadValue ? { ...storePreloadValue } : storePreloadValue;
-    hotDispose = () => { window[windowProperty] = store; };
+    core.state = storePreloadValue ? { ...storePreloadValue } : storePreloadValue;
+    hotDispose = () => { window[windowProperty] = core.state; };
   }
 
   /**
@@ -238,7 +259,7 @@ export default function Grocery({
     if (Array.isArray(action)) throw Error('Action must be an object.');
     if (typeof action.type !== 'string') throw Error('Action must contain type field.');
 
-    const newReducedState = reduce(store, action);
+    const newReducedState = reduce(core.state, action);
     let index = -1;
 
     let stackNewReducedState = newReducedState;
@@ -251,9 +272,7 @@ export default function Grocery({
     };
 
     const newState = next();
-
-    store = newState;
-    oStore.publish(newState);
+    core.setState(newState);
   };
 
   const messaging = {};
@@ -306,10 +325,10 @@ export default function Grocery({
    * @constructor
    */
   const Connector = ({ children }) => {
-    const [state, setState] = useState(initStateCopy);
+    const [state, setState] = useState(core.state);
 
     useEffect(() => {
-      oStore.subscribe(newState => setState(newState));
+      core.observer.subscribe(newState => setState(newState));
       // First mount is useful to detect that the Grocery is really used.
       if (!firstMount || checkFirstMounted) return;
       checkFirstMounted = true;
@@ -352,7 +371,7 @@ export default function Grocery({
    * Get current state.
    * @returns {*}
    */
-  this.getState = () => store;
+  this.getState = () => core.state;
 }
 
 /* --- Jest temporary hackity-hack --- */
