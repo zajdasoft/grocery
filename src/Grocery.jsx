@@ -45,8 +45,9 @@ export const addGroceryMiddleware = (middleware) => {
  * @param logger Logging object.
  * @returns {Function}
  */
-const groceryDefaultLogger = logger => (grocery, newState, action, next) => {
+const groceryDefaultLogger = logger => grocery => next => (action) => {
   const state = grocery.getState();
+  const newState = next(action);
 
   logger.group('%c action', 'color: #cccccc', `${(action && action.type) || action}`);
   logger.log('%caction', 'color: #cccccc', action);
@@ -59,7 +60,7 @@ const groceryDefaultLogger = logger => (grocery, newState, action, next) => {
   }
 
   logger.groupEnd();
-  return next();
+  return newState;
 };
 
 /**
@@ -259,19 +260,16 @@ export default function Grocery({
     if (Array.isArray(action)) throw Error('Action must be an object.');
     if (typeof action.type !== 'string') throw Error('Action must contain type field.');
 
-    const newReducedState = reduce(core.state, action);
     let index = -1;
 
-    let stackNewReducedState = newReducedState;
-    const next = (newAction = action, newState = stackNewReducedState) => {
-      if (newState !== stackNewReducedState) stackNewReducedState = newState;
+    const next = (newAction) => {
       index += 1;
       return index >= middlewares.length
-        ? newReducedState
-        : middlewares[index](this, newState, newAction, next);
+        ? reduce(core.state, newAction)
+        : middlewares[index](this)(next)(newAction);
     };
 
-    const newState = next();
+    const newState = next(action);
     core.setState(newState);
   };
 

@@ -179,7 +179,7 @@ Now we can enhance our reducer from ```src/AnotherModule.js```:
 
 ```javascript
 
-import MyGrocery, { ADD_TODO, REDUCER_BASE_TODO } from './groceries/MyGrocery';
+import MyGrocery, { REDUCER_BASE_TODO } from './groceries/MyGrocery';
 
 MyGrocery.enhanceReducer(REDUCER_BASE_TODO, (state, action, next) => {
   const newState = next();
@@ -199,7 +199,7 @@ From Grocery perspective, enhancer is another reducer, which makes possible to e
 This example shows how to use ``next`` to change ``ADD_TODO`` action when its payload is ``'test'``:
 ```javascript
 
-import MyGrocery, { ADD_TODO, REDUCER_BASE_TODO } from './groceries/MyGrocery';
+import MyGrocery, { REDUCER_BASE_TODO } from './groceries/MyGrocery';
 
 MyGrocery.enhanceReducer(REDUCER_BASE_TODO, (state, action, next) => {
   const newState = next(state, action.payload === 'test'
@@ -220,8 +220,9 @@ development or error logging in one place.
 import { addGroceryMiddleware, addGroceryLogger } from '@zajdasoft/grocery';
 
 addGroceryLogger();
-addGroceryMiddleware((grocery, newState, action, next) => {
-  next();
+addGroceryMiddleware(grocery => next => action => {
+  console.log(grocery.getState());
+  return next(action);
 });
 
 ```

@@ -4,7 +4,7 @@ const unmount = [];
 afterEach(() => unmount.forEach(item => item()));
 
 test('addGroceryMiddleware returns callback to remove the middleware', () => {
-  const remove = addGroceryMiddleware(() => {
+  const remove = addGroceryMiddleware(() => () => () => {
     throw Error('This middleware should not be executed.');
   });
 
@@ -18,17 +18,17 @@ test('addGroceryMiddleware returns callback to remove the middleware', () => {
 test('addGroceryMiddleware adds middleware & dispatch runs all middlewares', () => {
   let check = 0;
 
-  unmount.push(addGroceryMiddleware((grocery, newState, action, next) => {
+  unmount.push(addGroceryMiddleware(() => next => () => {
     check += 1;
     next();
   }));
 
-  unmount.push(addGroceryMiddleware((grocery, newState, action, next) => {
+  unmount.push(addGroceryMiddleware(() => next => () => {
     check += 1;
     next();
   }));
 
-  unmount.push(addGroceryMiddleware((grocery, newState, action, next) => {
+  unmount.push(addGroceryMiddleware(() => next => () => {
     check += 1;
     next();
   }));
@@ -44,9 +44,8 @@ test('a middleware gets all parameters as expected', () => {
   const testGrocery = new Grocery();
   testGrocery.addReducer(() => ({ test: true }));
 
-  unmount.push(addGroceryMiddleware((grocery, newState, action, next) => {
+  unmount.push(addGroceryMiddleware(grocery => next => (action) => {
     expect(grocery).toBe(testGrocery);
-    expect(newState).toEqual({ test: true });
     expect(action).toEqual({ type: 'TEST' });
     expect(next).toBeInstanceOf(Function);
   }));
@@ -54,8 +53,8 @@ test('a middleware gets all parameters as expected', () => {
   testGrocery.dispatch({ type: 'TEST' });
 });
 
-test('successful middleware chain sets new state', () => {
-  unmount.push(addGroceryMiddleware((grocery, newState, action, next) => next()));
+test('successful middleware chain sets reduced state', () => {
+  unmount.push(addGroceryMiddleware(() => next => action => next(action)));
 
   const testState = { test: true };
 
@@ -66,14 +65,14 @@ test('successful middleware chain sets new state', () => {
   expect(grocery.getState()).toEqual(testState);
 });
 
-test('middleware can change action for the middleware chain', () => {
+test('middleware passes action in the middleware chain', () => {
   const testGrocery = new Grocery();
   testGrocery.addReducer(() => ({ test: true }));
 
-  unmount.push(addGroceryMiddleware((grocery, newState, action, next) => next({ type: 'TEST2' })));
+  unmount.push(addGroceryMiddleware(() => next => () => next({ type: 'TEST2' })));
 
   let called = '';
-  unmount.push(addGroceryMiddleware((grocery, newState, { type }) => {
+  unmount.push(addGroceryMiddleware(() => () => ({ type }) => {
     called = type;
   }));
 
@@ -82,19 +81,12 @@ test('middleware can change action for the middleware chain', () => {
 });
 
 
-test('middleware can change newState for the middleware chain, this not affect result of reducer when the last middleware returns result of next()', () => {
+test('middleware returns news state', () => {
   const testGrocery = new Grocery();
   testGrocery.addReducer(() => ({ test: 1 }));
 
-  unmount.push(addGroceryMiddleware((grocery, newState, action, next) => next(action, { test: 2 })));
-
-  let called = 0;
-  unmount.push(addGroceryMiddleware((grocery, newState, action, next) => {
-    called = newState.test;
-    return next();
-  }));
+  unmount.push(addGroceryMiddleware(() => () => () => ({ state: 255 })));
 
   testGrocery.dispatch({ type: 'TEST' });
-  expect(called).toBe(2);
-  expect(testGrocery.getState().test).toBe(1);
+  expect(testGrocery.getState().state).toBe(255);
 });
