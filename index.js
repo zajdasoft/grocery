@@ -1,1 +1,1 @@
-module.exports = require('./lib/Grocery').default;
+module.exports = require('./lib/Grocery');

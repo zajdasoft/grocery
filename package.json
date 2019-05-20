@@ -20,7 +20,8 @@
     "js",
     "react",
     "store",
-    "multiple"
+    "multiple",
+    "flux"
   ],
   "author": "Jiří Zajíček",
   "license": "LGPL-3.0",
