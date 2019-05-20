@@ -1,6 +1,6 @@
 {
   "name": "@zajdasoft/grocery",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Grocery JS / React library bringing multiple stores and messaging system for modular webapps.",
   "main": "index.js",
   "scripts": {
